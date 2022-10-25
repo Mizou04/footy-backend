@@ -1,0 +1,47 @@
+{
+	"get": "standings",
+	"parameters": {
+		"season": "2022",
+		"league": "200"
+	},
+	"errors": [],
+	"results": 1,
+	"paging": {
+		"current": 1,
+		"total": 1
+	},
+	"response": [
+		{
+			"league": {
+				"id": 123,
+				"name": "botolaPro",
+				"country": "Morocco",
+				"logo": "https://media.api-sports.io/football/leagues/39.png",
+				"flag": "https://media.api-sports.io/flags/gb.svg",
+				"season": 2022,
+				"standings": [
+          [
+            {
+              "rank": 1,
+							"team": {
+								"id": 100,
+								"name": "WAC",
+								"logo": "https://media.api-sports.io/football/teams/47.png"
+							},
+							"points": 37
+            },
+            {
+              "rank": 2,
+							"team": {
+								"id": 101,
+								"name": "FAR",
+								"logo": "https://media.api-sports.io/football/teams/47.png"
+							},
+							"points": 32
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "footy",
+  "version": "1.0.0",
+  "description": "football application (uses api to get data and store in own db)",
+  "main": "main.ts",
+  "scripts": {
+    "dev" : "nodemon src/main.ts"
+  },
+  "keywords": [
+    "football",
+    "clean architecture"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
+  }
+}
