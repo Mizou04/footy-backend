@@ -1,41 +1,65 @@
 import http from "http";
-import qs from "querystring"
+import qs from "qs"
 import "dotenv/config"
 import callApi from "./api/callApi";
 import mockCallApi from "./api/mockCallApi";
+// import { seasons, createLast3Years } from "./api/seasons";
+import { Tparams } from "./api/types/params";
+import getStandings from "./api/handlers/getStandings";
+import availableLeagues from "./api/functions/createLeagues";
+import getLeagues from "./api/handlers/getLeagues";
+import getLeague from "./api/handlers/getLeague";
 
 let host = "localhost", port = 3000;
+
 
 let server = http.createServer({}, async (req, res)=>{
   res.writeHead(200, "OK", {
     "Content-type" : "application/json"
   })
   
-  console.log("req.url", req.url);
-
-  let hasParams = (req.url as string).indexOf("?") >=0;
-
-  let url = req.url?.slice(0, hasParams ? req.url.indexOf("?") : undefined);
-  console.log("url", url);
-
-  let paramsString = hasParams ? req.url?.slice(req.url.indexOf("?")+1) as string : '';
-
-  console.log("params : ", paramsString)
-
-
+  let url : URL = new URL(req.url as string, `http://${req.headers.host}`);
+  
   try {
-    if(!paramsString) throw new Error("params are necessary");
-    let callResult = await mockCallApi({url : url as string, params : paramsString});
     
-    switch(url){
+    let pathname = url.pathname;
+    let params = url.searchParams; 
+    let paramsString = params.toString();
+    
+    
+    switch(pathname){
       case "/api/standings" : {
         try {
-          res.end(callResult);
-          //res.end(await callApi({url, params : paramsString}));
+          if(!paramsString) throw new Error("params are necessary")
+          res.end(await getStandings(paramsString));
         } catch (error) {
           console.log(error);
-          res.writeHead(500, undefined, {});
-          res.end("something went wrong with server")
+          res.writeHead(404, undefined, {});
+          res.end(`{error : ${(error as Error).message}}`)
+        }
+        break;
+      }
+      // get seasons depending on league
+      case "/api/leagues" : {
+        try {
+          let leagues = await getLeagues();
+          res.end(JSON.stringify(leagues, null, 2));
+        } catch (error) {
+          console.log(error);
+          res.writeHead(404, undefined, {});
+          res.end(`{error : ${(error as Error).message}}`)
+        }
+        break;
+      }
+      case "/api/league" : {
+        try {
+          if(!paramsString) throw new Error("params are necessary")
+          let league = await getLeague(paramsString);
+          res.end(JSON.stringify(league, null, 2));
+        } catch (error) {
+          console.log(error);
+          res.writeHead(404, undefined, {});
+          res.end(`{error : ${(error as Error).message}}`)
         }
         break;
       }
@@ -46,13 +70,13 @@ let server = http.createServer({}, async (req, res)=>{
     }
   } catch (error) {
     console.log(error);
-    res.writeHead(404);
-    res.end(`{error : page not found}`);
+    res.writeHead(500);
+    res.end(`{error : sorry for the inconvenience}`);
   }
 
 })
 
 
 server.listen(port, host, undefined, ()=>{
-  console.log("listening")
+  console.log("listening at port " + port)
 })

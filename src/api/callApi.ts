@@ -1,26 +1,32 @@
 import https from "https";
-import config from "./config"
 import QS from "querystring"
-import fs from "fs";
-import path from "path";
 import "dotenv/config";
+import { Tparams } from "./types/params";
 
 
-type Tparams = {[k : string] : string | number} | string
+const HOSTNAME = "v3.football.api-sports.io";
 
-export default function callApi(input : {url : string, params : Tparams} ) : Promise<string>{
-  
-  input.url += input.url[input.url.length-1] !== "?" ? "?" : '';
-  input.params = typeof input.params == "string" ? input.params : QS.stringify(input.params);
+const HEADERS = {
+  "x-apisports-key" : process.env.API_KEY,
+}
+
+const PROTOCOL = "https:"
+
+/**
+ * 
+ * @param input.url is actually the pathname + params and not the whole url 
+ * @return
+ */
+export default function callApi(input : {url : string} ) : Promise<string>{
 
   return new Promise((resolve, reject)=>{
-    // let url = new URL("/standings", config.HOSTNAME);
+
     let options : https.RequestOptions = {
       method : "GET",
-      headers : config.HEADERS,
-      hostname : config.HOSTNAME,
-      path : input.url + input.params,
-      protocol : "https:",
+      headers : HEADERS,
+      protocol : PROTOCOL,
+      hostname : HOSTNAME,
+      path : input.url,
     };
 
     let request = https.request(options);

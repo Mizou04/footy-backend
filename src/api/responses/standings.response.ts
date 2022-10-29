@@ -1,4 +1,4 @@
-import standing from "@/entities/Standing";
+import standing from "@/interfaces/Standing";
 import IResponse from "./response";
 
 export default interface IStandingsResponse extends IResponse{
