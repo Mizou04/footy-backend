@@ -1,5 +1,6 @@
 import { leaguesIds } from "../leaguesIds";
 import callApi from "../callApi";
+import {default as leaguesJSON} from  "../../out/leagues.json"
 
 type response = {
   leagues : {
@@ -12,7 +13,7 @@ type response = {
 
 let data : response["leagues"][0][] = [];
 
-export async function makeLeagues(){
+async function makeLeagues(){
   try {
     for(let i = 0; i < leaguesIds.length; i++){
       let res = await callApi({url : "/leagues" + "?" + `id=${leaguesIds[i]}`})    
@@ -32,6 +33,7 @@ export async function makeLeagues(){
   }
 }
 
-let availableLeagues = makeLeagues();
+// let availableLeagues = makeLeagues();
+let availableLeagues = leaguesJSON;
 
 export default availableLeagues;

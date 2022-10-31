@@ -9,6 +9,7 @@ import getStandings from "./api/handlers/getStandings";
 import availableLeagues from "./api/functions/createLeagues";
 import getLeagues from "./api/handlers/getLeagues";
 import getLeague from "./api/handlers/getLeague";
+import getTeams from "./api/handlers/getTeams";
 
 let host = "localhost", port = 3000;
 
@@ -51,11 +52,10 @@ let server = http.createServer({}, async (req, res)=>{
         }
         break;
       }
-      case "/api/league" : {
+      case "/api/teams" : {
         try {
-          if(!paramsString) throw new Error("params are necessary")
-          let league = await getLeague(paramsString);
-          res.end(JSON.stringify(league, null, 2));
+          if(!paramsString) throw new Error("params are necessary");
+          res.end(await getTeams(paramsString));
         } catch (error) {
           console.log(error);
           res.writeHead(404, undefined, {});
@@ -63,6 +63,18 @@ let server = http.createServer({}, async (req, res)=>{
         }
         break;
       }
+      // case "/api/league" : {
+      //   try {
+      //     if(!paramsString) throw new Error("params are necessary")
+      //     let league = await getLeague(paramsString);
+      //     res.end(JSON.stringify(league, null, 2));
+      //   } catch (error) {
+      //     console.log(error);
+      //     res.writeHead(404, undefined, {});
+      //     res.end(`{error : ${(error as Error).message}}`)
+      //   }
+      //   break;
+      // }
       default : 
         res.writeHead(404);
         res.end("{error : not implemented}");

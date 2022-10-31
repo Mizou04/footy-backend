@@ -94,7 +94,7 @@ for(let i = 2016; i <= 2022; i++){
   arr.push({year : i})
 }
 
-console.log(arr);
+// console.log(arr);
 
 let v = arr.slice(-3).reduce((prev, curr, i)=>{
   prev[i] = curr.year;
@@ -103,6 +103,9 @@ let v = arr.slice(-3).reduce((prev, curr, i)=>{
 
 let qs = require( "qs")
 
-let url = new URL("/hamza?id=12&name=123", `http://localhost`);
+let url = new URL("/hamza?id&name=123", `http://localhost`);
 
-console.log(qs.parse(url.searchParams.toString()));
+let po = qs.parse(url.searchParams.toString());
+
+
+console.log(po)
