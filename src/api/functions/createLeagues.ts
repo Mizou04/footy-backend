@@ -13,10 +13,13 @@ type response = {
 
 let data : response["leagues"][0][] = [];
 
+let url = "/leagues";
+
 async function makeLeagues(){
   try {
     for(let i = 0; i < leaguesIds.length; i++){
-      let res = await callApi({url : "/leagues" + "?" + `id=${leaguesIds[i]}`})    
+      let params = {id : leaguesIds[i]};
+      let res = await callApi({url, params})    
       let json = JSON.parse(res);
       let jsonRes = json.response[0];
       let allSeasons : {year : number}[] = jsonRes.seasons;
@@ -33,7 +36,7 @@ async function makeLeagues(){
   }
 }
 
-// let availableLeagues = makeLeagues();
-let availableLeagues = leaguesJSON;
+let availableLeagues = makeLeagues();
+// let availableLeagues = leaguesJSON; // mock
 
 export default availableLeagues;

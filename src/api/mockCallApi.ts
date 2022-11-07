@@ -5,7 +5,7 @@ import path from "path"
 
 type Tparams = {[k : string] : string | number} | string
 
-export default async function(input : {url : string, params : string} ) : Promise<string>{
+export async function getLeaguesFromFile(input : {url : string, params : string} ) : Promise<string>{
   input.url += input.url[input.url.length-1] !== "?" ? "?" : '';
   
   let paramsObj = qs.parse(input.params);
@@ -15,3 +15,25 @@ export default async function(input : {url : string, params : string} ) : Promis
     return file;
 
 } 
+
+
+export async function getStanding(params : {[k : string] : number | string}){
+  try {
+  
+    if(!params["id"] || !params["season"]) throw new Error("season and id are necessary");
+    let PATH = path.resolve(__dirname, "../out/rankings.json"); 
+    
+    let file = await readFile(PATH);
+    let rankingsJson : [{id : number, season : number}] = JSON.parse(file);
+    let result = rankingsJson.filter(({id, season}) => {
+      return id === Number(params["id"])  && season === Number(params["season"])
+    })
+    if(result.length > 0)
+      return result
+    else 
+      throw new Error("no data")  
+  } catch (error) {
+    console.log(error);
+    throw error;
+  } 
+}

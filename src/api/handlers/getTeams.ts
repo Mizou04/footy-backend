@@ -6,32 +6,26 @@
 // WE CAN CACHE THE RESULT OF ALL TEAMS THEN RETURN ONE TEAM IF FETCHED WITHOUT CALLING THE API AGAIN  
 
 import callApi from "../callApi";
-import qs from "qs"
 import { leaguesIds } from "../leaguesIds";
 import getLeague from "./getLeague";
 
-type Tparams = string;
+type Tparams = {[k : string] : string | number};
 
 
 const URL = "/teams";
 
 export default async function getTeams(params : Tparams){
-  let paramsObj = qs.parse(params);
-  if(!paramsObj.hasOwnProperty("season") || !paramsObj.hasOwnProperty("league"))
+  if(!params["season"] || !params["league"])
     throw new Error("season and league are necessary");
     
   // restrict to only available leagues on the app
-  let leagueParamsObj = {
-    season : paramsObj.season,
-    id : paramsObj.league
-  };
-  if(!leaguesIds.includes(paramsObj["league"] as string))
+  if(!leaguesIds.includes(params["league"] as string))
     throw new Error("cannot get team from this league or league is invalid");
-  let league = await getLeague(qs.stringify(leagueParamsObj));
-  if(league
-    && !league.seasons.includes(Number(paramsObj["season"] as string))
-    ){
-      throw new Error("cannot get team from this season or season is invalid");
+  let league = await getLeague(params);
+    
+  if(league.id && !league.seasons.includes(Number(params["season"] as string)))
+  {
+      throw new Error("cannot get team from this league or season, or either season league is invalid");
   }
-  return (await callApi({url : URL + "?" + params}));
+  return (await callApi({url : URL, params}));
 }

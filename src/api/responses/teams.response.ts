@@ -1,5 +1,5 @@
-import Team from "@/entities/Team";
-import Venue from "@/entities/Venue";
+import Team from "@/interfaces/Team";
+import Venue from "@/interfaces/Venue";
 import IResponse from "./response";
 
 

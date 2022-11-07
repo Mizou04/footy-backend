@@ -3,7 +3,6 @@ import { leaguesIds } from "../leaguesIds";
 import qs from "qs"
 import availableLeagues from "../functions/createLeagues";
 import getLeague from "./getLeague";
-import mockCallApi from "../mockCallApi";
 
 /**
  * leagues ids and seasons are restricted to certain ids and seasons respectively
@@ -12,14 +11,14 @@ import mockCallApi from "../mockCallApi";
 
 // params : season + league => season=2022&league=200
 
-export default async function getStandings(params : string){
-  if(!/league/igm.test(params) && !/season/igm.test(params)) throw new Error("season and league id are necessary");
+export default async function getStandings(params : {[k : string] : string | number}){
+  if(!params["league"] && !params["season"]) throw new Error("season and league id are necessary");
 
-  let league = await getLeague(params.replace(/league/, "id"));
+  let league = await getLeague(params);
   
-  if(league){
+  if(league.id){
     let url = "/standings";
-    let data : string = await callApi({url : url + "?" + params});
+    let data : string = await callApi({url, params});
     
     return data;
   }

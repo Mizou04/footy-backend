@@ -15,7 +15,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "qs": "^6.11.0"
+    "qs": "^6.11.0",
+    "redis": "^4.4.0"
   },
   "devDependencies": {
     "@types/qs": "^6.9.7",

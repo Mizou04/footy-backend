@@ -3,21 +3,27 @@ import qs from "qs"
 import availableLeagues from "../functions/createLeagues";
 
 type Params = {
-  id : string | number
-  season : string | number
+  [k : string]: string | number
 }
 
-export default async function getLeague(params : string){
-    if(!/id/igm.test(params) && !/season/igm.test(params)) throw new Error("season and id are necessary");
-    let paramsObj : Params = qs.parse(params) as Params;
-    let league = availableLeagues.filter(({id, seasons})=>{
-      return id == paramsObj.id &&  seasons.includes(Number(paramsObj.season));
+type response =  {
+  id : string
+  name : string
+  logo : string
+  seasons : number[]
+}[]
+
+
+export default async function getLeague(params : Params ){
+    if(!params["league"] || !params["season"]) throw new Error("season and id are necessary");
+    let league = (await availableLeagues as response).filter(({id, seasons})=>{
+      return id == params.league &&  seasons.includes(Number(params.season));
     });
     if(league && league?.length > 0){
       return league[0];
     } else {
       throw new Error(
-        `league with id: ${paramsObj.id} is not available or season : ${paramsObj.season} is not yet reached or no longer valid`
+        `league with id: ${params.league} is not available or season : ${params.season} is not yet reached or no longer valid`
         );
     }
 }
