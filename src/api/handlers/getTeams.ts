@@ -27,5 +27,6 @@ export default async function getTeams(params : Tparams){
   {
       throw new Error("cannot get team from this league or season, or either season league is invalid");
   }
-  return (await callApi({url : URL, params}));
+  let data = await callApi({url : URL, params});
+  return JSON.parse(data).response;
 }

@@ -20,7 +20,7 @@ export default async function getStandings(params : {[k : string] : string | num
     let url = "/standings";
     let data : string = await callApi({url, params});
     
-    return data;
+    return JSON.parse(data).response;
   }
 }
 

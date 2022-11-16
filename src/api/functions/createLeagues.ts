@@ -36,7 +36,6 @@ async function makeLeagues(){
   }
 }
 
-let availableLeagues = makeLeagues();
 // let availableLeagues = leaguesJSON; // mock
 
-export default availableLeagues;
+export default makeLeagues;

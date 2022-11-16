@@ -11,6 +11,7 @@ import getLeagues from "./api/handlers/getLeagues";
 import getLeague from "./api/handlers/getLeague";
 import getTeams from "./api/handlers/getTeams";
 import redisClient from "./api/configs/redis"
+import { UnavailableData } from "./common/Errors";
 
 
 let host = "localhost", port = 3000;
@@ -27,7 +28,7 @@ let server = http.createServer({}, async (req, res)=>{
     "Access-Control-Allow-Origin" : process.env.NODE_ENV == 'production' ? 'null' : "http://localhost:3000"
   })
   
-  // await redisClient.SET(url.hrefname', 'hamza', {
+  // await redisClient.SET(req.url as stringname', 'hamza', {
   //   EX : 3600,
   //   NX : true
   // })
@@ -43,44 +44,44 @@ let server = http.createServer({}, async (req, res)=>{
     let paramsObj = qs.parse(paramsString) as {[key : string] : string | number};
 
     switch(pathname){
-      case "/api/standing" : {
-        try {
-          if(await redisClient.EXISTS(url.href)){ //caching
-            let cached = await redisClient.GET(url.href) as string;
-            console.log('sent from cache');
-            return res.end(JSON.parse(cached));
-          }
+      // case "/api/standing" : {
+      //   try {
+      //     if(await redisClient.EXISTS(req.url as string)){ //caching
+      //       let cached = await redisClient.GET(req.url as string) as string;
+      //       console.log('sent from cache');
+      //       return res.end(cached);
+      //     }
 
-          let result = await getStanding(paramsObj);
+      //     let result = await getStanding(paramsObj);
           
-          await redisClient.set(url.href, JSON.stringify(result), {EX : 3 * HOUR});
-          await redisClient.BGSAVE();
+      //     await redisClient.set(req.url as string, JSON.stringify(result), {EX : 3 * HOUR, NX : true});
+      //     await redisClient.BGSAVE();
 
-          setTimeout(()=>{
-            res.end(JSON.stringify(result))
-            console.log("sent from api [took 3 seconds]")
-          }, 3000)
+      //     setTimeout(()=>{
+      //       res.end(JSON.stringify(result))
+      //       console.log("sent from api [took 3 seconds]")
+      //     }, 3000)
         
-        } catch (error) {
-          res.writeHead(404);
-          res.end((error as Error).message);
-        }
-        break;
-      }
+      //   } catch (error) {
+      //     res.writeHead(404);
+      //     res.end((error as Error).message);
+      //   }
+      //   break;
+      // }
       case "/api/standings" : {
         try {
           if(!paramsString) throw new Error("params are necessary")
-          if(await redisClient.EXISTS(url.href)){
-            let cached = await redisClient.GET(url.href) as string;
+          if(await redisClient.EXISTS(req.url as string)){
+            let cached = await redisClient.GET(req.url as string) as string;
             console.log('sent from cache');
-            return res.end(JSON.parse(cached));
+            return res.end(cached);
           }
           let result = await getStandings(paramsObj);
+          res.end(JSON.stringify(result));
           
-          await redisClient.set(url.href, JSON.stringify(result), {EX : 3 * HOUR});
+          await redisClient.set(req.url as string, JSON.stringify(result), {EX : 3 * HOUR});
           await redisClient.BGSAVE();
 
-          res.end(result);
 
         } catch (error) {
           console.log(error);
@@ -91,21 +92,26 @@ let server = http.createServer({}, async (req, res)=>{
       }
       case "/api/leagues" : {
         try {
-          if(await redisClient.EXISTS(url.href)){ //caching
-            let cached = await redisClient.GET(url.href) as string;
+          if(await redisClient.EXISTS(req.url as string)){ //caching
+            let cached = await redisClient.GET(req.url as string) as string;
             console.log('sent from cache');
-            return res.end(JSON.parse(cached));
+            return res.end(cached);
           }
+          
           let leagues = await getLeagues();
+          res.end(JSON.stringify(leagues));
 
-          await redisClient.set(url.href, JSON.stringify(leagues), {EX : 5 * DAY});
+          await redisClient.set(req.url as string, JSON.stringify(leagues), {EX : 5 * DAY});
           await redisClient.BGSAVE();
 
-          res.end(leagues);
         } catch (error) {
           console.log(error);
           res.writeHead(404, undefined, {});
-          res.end(`{error : ${(error as Error).message}}`)
+          if(error instanceof UnavailableData){
+            res.end(`{error : ${(error as Error).message}}`)
+          } else {
+            res.end('{error : "page not found"}')
+          }
         }
         break;
       }
@@ -113,18 +119,18 @@ let server = http.createServer({}, async (req, res)=>{
         try {
           if(!paramsString) throw new Error("params are necessary");
           
-          if(await redisClient.EXISTS(url.href)){ //caching
-            let cached = await redisClient.GET(url.href) as string;
+          if(await redisClient.EXISTS(req.url as string)){ //caching
+            let cached = await redisClient.GET(req.url as string) as string;
             console.log('sent from cache');
-            return res.end(JSON.parse(cached));
+            return res.end(cached);
           }
 
           let teams = await getTeams(paramsObj);
+          res.end(JSON.stringify(teams));
 
-          await redisClient.set(url.href, JSON.stringify(teams), {EX : DAY});
+          await redisClient.set(req.url as string, JSON.stringify(teams), {EX : DAY});
           await redisClient.BGSAVE();
 
-          res.end(teams);
           
         } catch (error) {
           console.log(error);
@@ -137,14 +143,14 @@ let server = http.createServer({}, async (req, res)=>{
       //   try {
       //     if(!paramsString) throw new Error("params are necessary");
 
-      //     if(await redisClient.EXISTS(url.href)){ //caching
-      //       let cached = await redisClient.GET(url.href) as string;
+      //     if(await redisClient.EXISTS(req.url as string)){ //caching
+      //       let cached = await redisClient.GET(req.url as string) as string;
       //       console.log('sent from cache');
       //       return res.end(JSON.parse(cached));
       //     }          
       //     let league = await getLeague(paramsObj);
 
-      //     await redisClient.set(url.href, JSON.stringify(league), {EX : 2 * DAY});
+      //     await redisClient.set(req.url as string, JSON.stringify(league), {EX : 2 * DAY});
       //     await redisClient.BGSAVE();
 
       //     res.end(league);
