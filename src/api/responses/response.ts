@@ -3,7 +3,7 @@ export default interface IResponse{
   "parameters":{
     [key : string] : string
   },
-  "errors": [],
+  "errors": any[],
   "results": number,
   "paging": 
   {

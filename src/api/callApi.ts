@@ -16,7 +16,7 @@ const PROTOCOL = "https:"
  * @param input.url is actually the pathname + params and not the whole url 
  * @return
  */
-export default function callApi(input : {url : string, params : {[k : string] : string | number}} ) : Promise<string>{
+export default async function callApi(input : {pathname : string, params : {[k : string] : string | number}} ) : Promise<string>{
 
   return new Promise((resolve, reject)=>{
 
@@ -25,7 +25,7 @@ export default function callApi(input : {url : string, params : {[k : string] : 
       headers : HEADERS,
       protocol : PROTOCOL,
       hostname : HOSTNAME,
-      path : input.url + "?" + qs.stringify(input.params),  
+      path : input.pathname + "?" + qs.stringify(input.params),  
     };
 
     let request = https.request(options);

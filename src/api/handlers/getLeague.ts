@@ -1,32 +1,22 @@
-/* get one league via [id] and [season] params  */
-import { UnavailableData } from "@/common/Errors";
-import qs from "qs"
-import availableLeagues from "../functions/createLeagues";
-import getLeagues from "./getLeagues";
+/* get one league via [id]*/
+import callApi from "../callApi";
 
 type Params = {
   [k : string]: string | number
 }
 
-type response =  {
-  id : string
-  name : string
-  logo : string
-  seasons : number[]
-}[]
 
+export default async function getLeague(params : Params){
+  if(!params["id"]) throw new Error("league id is necessary");
+  let pathname = "/leagues";
+  let serverResponse = JSON.parse(await callApi({pathname, params : {id : params["id"]}}));
+  let response : any[] = serverResponse.response;
 
-export default async function getLeague(params : Params ){
-    if(!params["league"] || !params["season"]) throw new Error("season and id are necessary");
-    let league = (await getLeagues() as response).filter(({id, seasons})=>{
-      return id == params.league &&  seasons.includes(Number(params.season));
-    });
-
-    if(league && league?.length > 0){
-      return league[0];
-    } else {
-      throw new Error(
-        `league with id: ${params.league} is not available or season : ${params.season} is not yet reached or no longer valid`
-        );
-    }
+  if(response && response.length > 0){
+    return response[0];
+  } else {
+    throw new Error(
+      `league with id: ${params.league} is not available or season : ${params.season} is not yet reached or no longer valid`
+    );
+  }
 }

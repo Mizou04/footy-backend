@@ -1,7 +1,9 @@
 .env
 node_modules
 *test.js
-./dist/
+dist
 ./types/
-
 persistence
+out
+src/out
+dist

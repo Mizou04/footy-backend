@@ -4,7 +4,9 @@
   "description": "football application (uses api to get data and store in own db)",
   "main": "main.ts",
   "scripts": {
-    "dev": "nodemon src/main.ts",
+    "dev": "npm run run-redis && nodemon src/main.ts",
+    "run-redis" : "redis-server persistence/redis/myredis.conf",
+    "start": "ts-node src/main.ts && npm run fix-paths",
     "build": "tsc -p . && npm run fix-paths",
     "fix-paths": "tspath -f"
   },

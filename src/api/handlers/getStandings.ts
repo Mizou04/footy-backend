@@ -1,8 +1,6 @@
 import callApi from "../callApi";
 import { leaguesIds } from "../leaguesIds";
-import qs from "qs"
-import availableLeagues from "../functions/createLeagues";
-import getLeague from "./getLeague";
+import getSeasons from "./getSeasons";
 
 /**
  * leagues ids and seasons are restricted to certain ids and seasons respectively
@@ -13,14 +11,13 @@ import getLeague from "./getLeague";
 
 export default async function getStandings(params : {[k : string] : string | number}){
   if(!params["league"] && !params["season"]) throw new Error("season and league id are necessary");
-
-  let league = await getLeague(params);
   
-  if(league.id){
-    let url = "/standings";
-    let data : string = await callApi({url, params});
-    
+  if(leaguesIds.includes(params["league"] as string)){
+  
+    let pathname = "/standings";
+    let data : string = await callApi({pathname, params});
     return JSON.parse(data).response;
+    
   }
 }
 
